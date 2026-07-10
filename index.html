@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>영단어 5</title>
+  <title>영단어 5자</title>
   <meta name="description" content="12시간마다 바뀌는 5글자 영어 단어 게임">
   <meta name="theme-color" content="#fee500">
   <style>
@@ -2165,11 +2165,11 @@
       }
 
       async function shareResult() {
-        const text = buildShareText();
+        const shareData = buildShareData();
 
         if (navigator.share) {
           try {
-            await navigator.share({ text });
+            await navigator.share(shareData);
             return;
           } catch (error) {
             if (error.name === "AbortError") {
@@ -2179,25 +2179,33 @@
         }
 
         try {
-          await navigator.clipboard.writeText(text);
+          await navigator.clipboard.writeText(buildShareText(shareData));
           showStatus("결과를 복사했습니다.");
           shareOutput.hidden = true;
         } catch (error) {
           shareOutput.hidden = false;
-          shareOutput.value = text;
+          shareOutput.value = buildShareText(shareData);
           shareOutput.focus();
           shareOutput.select();
           showStatus("아래 결과를 복사하세요.");
         }
       }
 
-      function buildShareText() {
+      function buildShareData() {
         const score = state.won ? `${state.guesses.length}/${MAX_ATTEMPTS}` : `X/${MAX_ATTEMPTS}`;
         const rows = state.guesses.map((guess) => gradeGuess(guess, solution.word)
           .map((grade) => ({ correct: "🟩", present: "🟨", absent: "⬛" })[grade])
           .join(""));
         const url = window.location.href.split("#")[0];
-        return [`영단어 5 ${today.label} ${score}`, ...rows, url].join("\n");
+        return {
+          title: "영단어 5",
+          text: [`영단어 5 ${today.label} ${score}`, ...rows].join("\n"),
+          url
+        };
+      }
+
+      function buildShareText(shareData) {
+        return [shareData.text, shareData.url].join("\n");
       }
     })();
   </script>
