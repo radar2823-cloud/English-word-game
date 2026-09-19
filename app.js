@@ -1,0 +1,85 @@
+// 50개의 상황 미션. 한 미션은 선택형 2개와 문장 조립 1개로 이루어집니다.
+const scenes=[
+['카페에서 주문하기','☕','아이스 라테를 주문하세요.',`I'd like an iced latte.`,'오트밀크로 바꿔 달라고 하세요.',`Could I get it with oat milk?`,'중간 크기로 달라고 하세요.',`Can I get a medium?`],
+['길 묻기','🗺️','박물관으로 가는 길을 물어보세요.',`Excuse me, how do I get to the museum?`,'얼마나 먼지 물어보세요.',`How far is it?`,'신호등에서 좌회전하는지 확인하세요.',`Should I turn left at the light?`],
+['옷 가게에서 쇼핑하기','🧥','이 재킷을 입어 보고 싶다고 하세요.',`I'd like to try on this jacket.`,'더 큰 사이즈가 있는지 물어보세요.',`Do you have this in a larger size?`,'검은색도 있는지 물어보세요.',`Do you have this in black?`],
+['공항 체크인','✈️','체크인 카운터가 어디인지 물어보세요.',`Where is the check-in counter?`,'창가 좌석을 요청하세요.',`Could I have a window seat?`,'가방을 부치고 싶다고 하세요.',`Can I check this bag?`],
+['호텔 체크인','🏨','예약이 있다고 말하세요.',`I have a reservation.`,'조식 시간을 물어보세요.',`What time is breakfast served?`,'늦은 체크아웃을 요청하세요.',`Could I get a late checkout?`],
+['레스토랑 예약','🍽️','두 명 자리를 예약하고 싶다고 하세요.',`I'd like to make a reservation for two.`,'창가 자리를 요청하세요.',`Could we get a table by the window?`,'예약자 이름을 말하세요.',`The reservation is under Kim.`],
+['음식 주문','🍜','추천 메뉴를 물어보세요.',`What do you recommend?`,'물을 요청하세요.',`Could I have some water?`,'땅콩이 들어가는지 물어보세요.',`Does this contain peanuts?`],
+['계산하기','💳','계산서를 요청하세요.',`Could we get the check, please?`,'카드 결제가 되는지 물어보세요.',`Can I pay with a card?`,'각자 계산하고 싶다고 하세요.',`Could we split the check?`],
+['약속 잡기','📅','토요일에 시간이 있는지 물어보세요.',`Are you free this Saturday?`,'오후 세 시를 제안하세요.',`How about three in the afternoon?`,'조금 더 늦게 만날 수 있는지 물어보세요.',`Can we meet a little later?`],
+['자기소개','👋','처음 만난 사람에게 자신을 소개하세요.',`Nice to meet you. I'm Mina.`,'상대의 출신을 물어보세요.',`Where are you from?`,'무슨 일을 하는지 물어보세요.',`What do you do for work?`],
+['전화 통화','📞','누가 전화했는지 물어보세요.',`May I ask who's calling?`,'잠시 기다려 달라고 하세요.',`Could you hold on for a moment?`,'메시지를 남겨도 되는지 물어보세요.',`Can I leave a message?`],
+['약국 방문','💊','두통약이 필요하다고 말하세요.',`I need something for a headache.`,'복용 빈도를 물어보세요.',`How often should I take this?`,'부작용이 있는지 물어보세요.',`Are there any side effects?`],
+['병원 예약','🩺','진료 예약을 잡으세요.',`I'd like to make an appointment.`,'오늘 가능한 예약이 있는지 물어보세요.',`Are there any appointments available today?`,'어제부터 열이 났다고 말하세요.',`I've had a fever since yesterday.`],
+['도서관','📚','도서관 카드를 만들고 싶다고 하세요.',`I'd like to get a library card.`,'대출 기간을 물어보세요.',`How long can I check this book out for?`,'책을 어디에 반납하는지 물어보세요.',`Where should I return this book?`],
+['학교 수업','🏫','질문이 있다고 말하세요.',`I have a question.`,'다시 설명해 달라고 하세요.',`Could you explain that again?`,'과제 마감일을 물어보세요.',`When is the assignment due?`],
+['발표 준비','🎤','발표 주제를 소개하세요.',`Today, I'd like to talk about our new project.`,'질문을 받겠다고 말하세요.',`I'd be happy to answer any questions.`,'다음 내용으로 넘어가세요.',`Let's move on to the next point.`],
+['면접','💼','자신의 강점을 말하세요.',`I'm good at working with people.`,'지원한 직무에 관심을 표현하세요.',`I'm very interested in this position.`,'직무에 관해 더 설명해 달라고 하세요.',`Could you tell me more about the role?`],
+['회의','🤝','아이디어에 긍정적인 의견을 말하세요.',`I think that's a great idea.`,'다른 의견을 부드럽게 말하세요.',`I see your point, but I don't agree.`,'상대의 의미를 명확히 해 달라고 하세요.',`Could you clarify what you mean?`],
+['회사 이메일','✉️','검토할 파일을 첨부했다고 쓰세요.',`I've attached the file for you to review.`,'답장을 기다린다고 정중하게 쓰세요.',`I look forward to hearing from you.`,'금요일까지 보내 달라고 요청하세요.',`Could you send it by Friday?`],
+['택시 타기','🚕','이 주소로 가 달라고 하세요.',`Could you take me to this address?`,'여기서 세워 달라고 하세요.',`Please stop here.`,'목적지까지 걸리는 시간을 물어보세요.',`How long will it take to get there?`],
+['버스 이용','🚌','이 버스가 시청에 가는지 물어보세요.',`Does this bus go to City Hall?`,'다음 정류장을 물어보세요.',`What's the next stop?`,'도착하면 알려 달라고 하세요.',`Could you let me know when we get there?`],
+['기차역','🚆','부산행 표 한 장을 요청하세요.',`One ticket to Busan, please.`,'출발 선로를 물어보세요.',`What track does the train leave from?`,'왕복표를 요청하세요.',`I'd like a round-trip ticket.`],
+['렌터카','🚗','차를 빌리고 싶다고 하세요.',`I'd like to rent a car.`,'보험 포함 여부를 물어보세요.',`Does that include insurance?`,'기름을 가득 채워 반납해야 하는지 물어보세요.',`Do I need to return it with a full tank?`],
+['날씨','🌦️','내일 날씨를 물어보세요.',`What's the weather like tomorrow?`,'우산을 가져가야 하는지 물어보세요.',`Should I bring an umbrella?`,'오늘 최고 기온을 물어보세요.',`What's the high today?`],
+['취미 대화','🎨','주말에 무엇을 하는지 물어보세요.',`What do you do on weekends?`,'상대의 취미가 재미있어 보인다고 하세요.',`That sounds like a lot of fun.`,'그 취미를 어떻게 시작했는지 물어보세요.',`How did you get into that?`],
+['영화관','🎬','저녁 7시 영화표 두 장을 요청하세요.',`I'd like two tickets for the 7 p.m. show.`,'영화 시작 시간을 물어보세요.',`What time does the movie start?`,'뒤쪽 좌석이 있는지 물어보세요.',`Are there any seats in the back?`],
+['콘서트','🎵','입구 위치를 물어보세요.',`Where is the entrance?`,'사진 촬영 가능 여부를 물어보세요.',`Can I take pictures here?`,'화장실 위치를 물어보세요.',`Where are the restrooms?`],
+['헬스장','🏋️','회원권 가격을 물어보세요.',`How much does a membership cost?`,'체험 수업이 있는지 물어보세요.',`Do you offer a trial class?`,'문 닫는 시간을 물어보세요.',`What time does the gym close?`],
+['미용실','💇','머리 끝만 조금 잘라 달라고 하세요.',`Just a little off the ends, please.`,'예약이 필요한지 물어보세요.',`Do I need to make an appointment?`,'앞머리를 다듬어 달라고 하세요.',`Could you trim my bangs?`],
+['세탁소','👕','언제 찾을 수 있는지 물어보세요.',`When can I pick this up?`,'당일 서비스가 있는지 물어보세요.',`Do you offer same-day service?`,'얼룩을 지울 수 있는지 물어보세요.',`Can you remove this stain?`],
+['우체국','📮','이 소포를 보내고 싶다고 하세요.',`I'd like to mail this package.`,'도착까지 걸리는 시간을 물어보세요.',`How long will it take to arrive?`,'배송 조회 번호를 요청하세요.',`Can I get a tracking number?`],
+['은행','🏦','환전하고 싶다고 하세요.',`I'd like to exchange some money.`,'수수료가 있는지 물어보세요.',`Is there a service fee?`,'오늘 환율을 물어보세요.',`What's today's exchange rate?`],
+['분실물','👜','지갑을 잃어버린 것 같다고 하세요.',`I think I lost my wallet.`,'분실물 센터 위치를 물어보세요.',`Where is the lost and found?`,'지갑의 생김새를 설명하세요.',`It's a small black wallet.`],
+['휴대폰 매장','📱','충전기를 찾고 있다고 하세요.',`I'm looking for a charger.`,'휴대폰과 호환되는지 물어보세요.',`Will this work with my phone?`,'구매 전에 사용해 봐도 되는지 물어보세요.',`Can I try it before I buy it?`],
+['사진 찍기','📸','일행의 사진을 찍어 달라고 하세요.',`Could you take a picture of us?`,'가로 방향으로 찍어 달라고 하세요.',`Could you take one horizontally?`,'한 장 더 찍어 달라고 하세요.',`Could you take one more?`],
+['친구 위로하기','💛','친구 편이라고 말하세요.',`I'm here for you.`,'도울 일이 있는지 물어보세요.',`Is there anything I can do?`,'이야기하고 싶으면 들어주겠다고 하세요.',`I'm here if you want to talk.`],
+['사과하기','🙏','늦어서 미안하다고 하세요.',`I'm sorry I'm late.`,'기다려 줘서 고맙다고 하세요.',`Thanks for waiting for me.`,'보상하겠다고 말하세요.',`Let me make it up to you.`],
+['칭찬하기','🌟','멋진 일을 했다고 칭찬하세요.',`You did a great job.`,'자랑스럽다고 말하세요.',`I'm really proud of you.`,'그 색이 잘 어울린다고 하세요.',`That color looks great on you.`],
+['파티 초대','🎉','파티에 초대하세요.',`Would you like to come to my party?`,'친구를 데려와도 된다고 하세요.',`Feel free to bring a friend.`,'초대를 기쁘게 수락하세요.',`I'd love to come.`],
+['집 구하기','🏠','아파트를 보고 싶다고 하세요.',`I'd like to see the apartment.`,'공과금 포함 여부를 물어보세요.',`Are utilities included?`,'반려동물 허용 여부를 물어보세요.',`Are pets allowed?`],
+['이웃과 대화','🌳','소음을 줄여 달라고 정중하게 말하세요.',`Would you mind keeping the noise down?`,'도움이 필요하면 알려 달라고 하세요.',`Let me know if you need any help.`,'새 이웃이라고 인사하세요.',`Hi, I'm your new neighbor.`],
+['요리','🍳','이 음식을 어떻게 만들었는지 물어보세요.',`How did you make this?`,'재료가 충분한지 물어보세요.',`Do we have enough ingredients?`,'맛을 보고 의견을 달라고 하세요.',`Could you taste this and tell me what you think?`],
+['시장 쇼핑','🥬','가격을 물어보세요.',`How much are these?`,'가격을 조금 낮출 수 있는지 물어보세요.',`Could you lower the price a little?`,'2파운드를 사겠다고 하세요.',`I'll take two pounds, please.`],
+['반품하기','📦','상품을 반품하고 싶다고 하세요.',`I'd like to return this item.`,'영수증이 필요한지 물어보세요.',`Do I need the receipt?`,'다른 사이즈로 교환하고 싶다고 하세요.',`Could I exchange it for a different size?`],
+['온라인 주문','🛒','주문 상태를 확인해 달라고 하세요.',`Could you check the status of my order?`,'배송지를 변경할 수 있는지 물어보세요.',`Can I change the delivery address?`,'도착 예정일을 물어보세요.',`When should it arrive?`],
+['공원에서','🌲','사진 촬영을 부탁하세요.',`Would you mind taking a photo?`,'화장실 위치를 물어보세요.',`Where is the restroom?`,'산책로가 초보자에게 적합한지 물어보세요.',`Is this trail beginner-friendly?`],
+['해변에서','🏖️','비치 파라솔을 빌리고 싶다고 하세요.',`I'd like to rent a beach umbrella.`,'수영하기 안전한지 물어보세요.',`Is it safe to swim here?`,'비치 의자를 어디서 빌리는지 물어보세요.',`Where can I rent a beach chair?`],
+['관광 안내소','🧭','지도를 요청하세요.',`Could I have a map?`,'꼭 가 볼 명소를 물어보세요.',`What are some must-see attractions?`,'오늘 가이드 투어가 있는지 물어보세요.',`Are there any guided tours today?`],
+['박물관','🏛️','오디오 가이드가 있는지 물어보세요.',`Do you offer audio guides?`,'실내 사진 촬영 가능 여부를 물어보세요.',`Are photos allowed inside?`,'폐관 시간을 물어보세요.',`What time does the museum close?`],
+['작별 인사','👋','즐거운 시간을 보냈다고 하세요.',`I had a great time.`,'곧 다시 만나자고 하세요.',`Let's catch up again soon.`,'계속 연락하자고 하세요.',`Let's keep in touch.`]
+];
+const $=s=>document.querySelector(s);let mission,step=0,score=0,selected=[];
+const RECORD_KEY='eq-records-v1';
+const KST=9*60*60*1000,HALF=12*60*60*1000;
+function slot(){return Math.floor((Date.now()+KST)/HALF)}
+function shuffle(a,seed){let out=[...a],x=(seed>>>0)||1;for(let i=out.length-1;i>0;i--){x=(x*1664525+1013904223)>>>0;let j=x%(i+1);[out[i],out[j]]=[out[j],out[i]]}return out}
+function deck(){return shuffle([...Array(scenes.length).keys()],20260812)}
+function current(){return scenes[deck()[slot()%scenes.length]]}
+function words(sentence){return sentence.replace('?',' ?').replace('.',' .').split(' ')}
+function wrongAnswers(answer){let pool=scenes.flatMap(x=>[x[3],x[5],x[7]]).filter(x=>x!==answer);return shuffle(pool,slot()+answer.length).slice(0,2)}
+function makeMission(s){return {name:s[0].toUpperCase()+' QUEST',scene:s[0],icon:s[1],desc:s[2],steps:[
+ {speaker:'YOUR TURN',prompt:s[2],instruction:'가장 자연스러운 영어 표현을 고르세요.',options:shuffle([s[3],...wrongAnswers(s[3])],slot()),correct:null,answer:s[3],tip:`“${s[3]}”`},
+ {speaker:'YOUR TURN',prompt:s[4],instruction:'상황에 알맞은 표현을 고르세요.',options:shuffle([s[5],...wrongAnswers(s[5])],slot()+1),correct:null,answer:s[5],tip:`“${s[5]}”`},
+ {speaker:'YOUR TURN',prompt:s[6],instruction:'단어 카드를 눌러 새로운 문장을 완성하세요.',words:words(s[7]),answer:words(s[7]),tip:`“${s[7]}”`}
+]}}
+function readRecords(){let records={sessions:{}};try{records=JSON.parse(localStorage.getItem(RECORD_KEY))||records}catch(e){};if(!records.sessions)records.sessions={};return records}
+function migrateOldRecords(records){if(records.migrated)return records;for(let i=0;i<localStorage.length;i++){let key=localStorage.key(i),match=key&&key.match(/^eq-(\d+)$/);if(!match||records.sessions[match[1]])continue;try{let old=JSON.parse(localStorage.getItem(key));if(old?.done)records.sessions[match[1]]={score:Number(old.score)||0,scene:'기존 기록'}}catch(e){}}records.migrated=true;localStorage.setItem(RECORD_KEY,JSON.stringify(records));return records}
+function recordStats(records){let entries=Object.entries(records.sessions).map(([key,value])=>({slot:Number(key),score:Number(value.score)||0,scene:value.scene||'영어 미션'})).filter(x=>Number.isFinite(x.slot)).sort((a,b)=>a.slot-b.slot);let best=0,current=0,run=0,previous=null;for(let item of entries){run=previous!==null&&item.slot===previous+1?run+1:1;best=Math.max(best,run);previous=item.slot}if(entries.length){let last=entries[entries.length-1].slot;if(last>=slot()-1){current=1;for(let i=entries.length-2;i>=0&&entries[i+1].slot===entries[i].slot+1;i--)current++}}return {entries,best,current,total:entries.length,average:entries.length?entries.reduce((sum,x)=>sum+x.score,0)/entries.length:0}}
+function titleForStreak(streak){if(streak>=50)return '원어민 ㅇㅈ';if(streak>=30)return '영주권 발급';if(streak>=10)return '토익 900 동급';if(streak>=5)return '영단어 고수';return ''}
+function updateRecordsUI(){let stats=recordStats(migrateOldRecords(readRecords()));$('#start-streak').textContent=stats.current;$('#best-streak').textContent=stats.best;$('#completed-count').textContent=stats.total;$('#average-score').textContent=`평균 ${stats.average.toFixed(1)} / 3`;let list=$('#history-list');list.innerHTML=stats.entries.slice(-5).reverse().map(x=>`<div class="history-row"><span>${x.scene}</span><strong>${x.score}/3</strong></div>`).join('')||'<p class="empty-history">아직 완료한 미션이 없습니다.</p>'}
+function saveResult(){let records=migrateOldRecords(readRecords()),key=String(slot()),old=records.sessions[key];records.sessions[key]={score:Math.max(Number(old?.score)||0,score),scene:mission.scene};localStorage.setItem(RECORD_KEY,JSON.stringify(records));return recordStats(records)}
+function remaining(){let ms=(slot()+1)*HALF-(Date.now()+KST);let h=String(Math.floor(ms/36e5)).padStart(2,'0'),m=String(Math.floor(ms%36e5/6e4)).padStart(2,'0'),s=String(Math.floor(ms%6e4/1e3)).padStart(2,'0');return `${h}:${m}:${s}`}
+function init(){mission=makeMission(current());for(let id of ['scene-icon','game-icon'])$('#'+id).textContent=mission.icon;$('#scene-title').textContent=mission.scene;$('#scene-description').textContent=mission.desc;$('#period-label').textContent=`MISSION ${String(slot()%50+1).padStart(2,'0')} / 50`;$('#countdown').textContent=remaining();updateRecordsUI();setInterval(()=>$('#countdown').textContent=remaining(),1000)}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden')}function start(){step=0;score=0;show('#game-screen');renderStep()}
+function renderStep(){selected=[];let q=mission.steps[step];if(q.options)q.correct=q.options.indexOf(q.answer);$('#step-indicator').textContent=`0${step+1} / 03`;$('#progress-bar').style.width=`${(step+1)*33.33}%`;$('#score-label').textContent=`SCORE ${score}`;$('#game-scene').textContent=mission.name;$('#speaker').textContent=q.speaker;$('#prompt').textContent=q.prompt;$('#instruction').textContent=q.instruction;$('#feedback').className='feedback hidden';$('#next-btn').classList.add('hidden');let box=$('#answers');box.innerHTML='';if(q.options)q.options.forEach((o,i)=>{let b=document.createElement('button');b.className='answer';b.textContent=o;b.onclick=()=>choose(i,b);box.append(b)});else renderBuilder()}
+function choose(i,btn){let q=mission.steps[step],all=[...document.querySelectorAll('.answer')],good=i===q.correct;all.forEach(b=>b.disabled=true);btn.classList.add(good?'correct':'wrong');if(!good)all[q.correct].classList.add('correct');if(good)score++;feedback(good,q.tip)}
+function renderBuilder(){let q=mission.steps[step],box=$('#answers');box.innerHTML=`<div class="sentence" id="sentence">여기에 단어를 놓으세요</div><div class="word-bank" id="bank"></div><button class="primary check" id="check">문장 확인 <span>✓</span></button>`;shuffle(q.words,slot()+2).forEach(word=>{let b=document.createElement('button');b.className='word';b.textContent=word;b.onclick=()=>{if(!b.classList.contains('used')){selected.push(word);b.classList.add('used');drawSentence()}};$('#bank').append(b)});$('#check').onclick=checkSentence}
+function drawSentence(){let s=$('#sentence');s.innerHTML=selected.length?selected.map((x,i)=>`<span class="chip" data-i="${i}">${x}</span>`).join(' '):'여기에 단어를 놓으세요';s.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{let w=selected.splice(+c.dataset.i,1)[0];[...document.querySelectorAll('.word')].find(x=>x.textContent===w&&x.classList.contains('used'))?.classList.remove('used');drawSentence()})}
+function checkSentence(){let q=mission.steps[step],good=selected.join('|')===q.answer.join('|');if(good)score++;document.querySelectorAll('.word').forEach(x=>x.disabled=true);$('#check').disabled=true;feedback(good,good?q.tip:`정답은 “${q.answer.join(' ')}” 입니다.`)}
+function feedback(good,text){let f=$('#feedback');f.innerHTML=`<strong>${good?'정답이에요! ✦':'아쉬워요 — 다음엔 맞힐 수 있어요.'}</strong><br>${text}`;f.className=`feedback ${good?'':'bad'}`;$('#next-btn').textContent=step===2?'결과 보기 →':'다음 대화 →';$('#next-btn').classList.remove('hidden')}function next(){if(++step<3)renderStep();else results()}
+function results(){let stats=saveResult(),title=titleForStreak(stats.current);updateRecordsUI();$('#result-name').textContent=mission.name;$('#final-score').textContent=score;$('#streak').textContent=stats.current;$('#title-badge').textContent=title?`칭호 · ${title}`:'';$('#title-badge').classList.toggle('hidden',!title);$('#result-message').textContent=score===3?'완벽합니다! 오늘의 핵심 표현을 모두 익혔어요.':'미션을 끝냈어요. 핵심 표현을 한 번 더 확인해 보세요.';$('#review').innerHTML=`<strong>오늘의 핵심 표현</strong><br>${mission.steps.map(x=>x.tip).join('<br>')}`;$('#next-time').textContent=remaining().slice(0,5);show('#result-screen')}
+async function share(){let stats=recordStats(migrateOldRecords(readRecords())),title=titleForStreak(stats.current),text=`ENGLISH QUEST — ${mission.scene}\n내 점수: ${score}/3 ✦\n현재 연승: ${stats.current}회\n최고 연승: ${stats.best}회\n칭호: ${title||'아직 없음'}\n12시간마다 바뀌는 오늘의 영어 미션에 도전해 봐!\n${location.href}`;try{if(navigator.share)await navigator.share({title:'English Quest',text});else{await navigator.clipboard.writeText(text);toast('결과가 클립보드에 복사됐어요!')}}catch(e){if(e.name!=='AbortError')toast('공유할 수 없어요.')}}function toast(t){let x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2500)}
+$('#start-btn').onclick=start;$('#next-btn').onclick=next;$('#share-btn').onclick=share;$('#home-btn').onclick=()=>{updateRecordsUI();show('#start-screen')};$('#history-btn').onclick=()=>{$('#history-panel').classList.toggle('hidden');$('#history-btn').textContent=$('#history-panel').classList.contains('hidden')?'기록 보기':'기록 닫기'};init();
