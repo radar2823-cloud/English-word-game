@@ -320,6 +320,45 @@
       font-size: 1.15rem;
     }
 
+    .streak-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+
+    .streak-stat {
+      padding: 10px;
+      border-radius: 8px;
+      background: #f4f6f8;
+      text-align: center;
+    }
+
+    .streak-stat span {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .streak-stat strong {
+      color: var(--ink);
+      font-size: 1.08rem;
+      font-weight: 900;
+    }
+
+    .streak-title {
+      grid-column: 1 / -1;
+      padding: 10px 12px;
+      border: 1px solid #e0bd00;
+      border-radius: 8px;
+      background: #fff8cc;
+      color: #554700;
+      text-align: center;
+      font-weight: 900;
+    }
+
     .word-note {
       margin: 10px 0 12px;
       padding-top: 12px;
@@ -534,6 +573,11 @@
       <section class="result-panel" id="resultPanel" hidden>
         <p class="result-title" id="resultTitle"></p>
         <div class="answer" id="answerLine"></div>
+        <div class="streak-summary" id="streakSummary">
+          <div class="streak-stat"><span>현재 연승</span><strong id="currentStreak">0회</strong></div>
+          <div class="streak-stat"><span>최고 연승</span><strong id="bestStreak">0회</strong></div>
+          <div class="streak-title" id="streakTitle" hidden></div>
+        </div>
         <div class="word-note" id="wordNote" hidden></div>
         <button class="share-button" id="shareButton" type="button">결과 공유</button>
         <textarea class="share-output" id="shareOutput" readonly hidden></textarea>
@@ -568,6 +612,7 @@
       const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
       const BASE_SLOT = Math.floor(Date.UTC(2026, 0, 1) / HALF_DAY_MS);
       const DAILY_RANDOM_SEED = "word5-kakao-daily-2026";
+      const STREAK_STORAGE_KEY = "word5:streak:v1";
 
       const ANSWERS = [
         "ABOUT", "ABOVE", "ACORN", "ACTOR", "ADAPT", "ADMIT", "ADORE", "AFTER",
@@ -1754,6 +1799,9 @@
       const resultPanel = document.querySelector("#resultPanel");
       const resultTitle = document.querySelector("#resultTitle");
       const answerLine = document.querySelector("#answerLine");
+      const currentStreak = document.querySelector("#currentStreak");
+      const bestStreak = document.querySelector("#bestStreak");
+      const streakTitle = document.querySelector("#streakTitle");
       const wordNote = document.querySelector("#wordNote");
       const shareButton = document.querySelector("#shareButton");
       const shareOutput = document.querySelector("#shareOutput");
@@ -1767,6 +1815,7 @@
       const solution = pickSolution(today.dateKey);
       const storageKey = `word5:${today.dateKey}`;
       let state = loadState();
+      let streakStats = initializeStreakStats();
 
       dateLine.textContent = `${today.label} · ${String(today.puzzleNumber).padStart(3, "0")}번째`;
 
@@ -1907,6 +1956,119 @@
         }));
       }
 
+      function initializeStreakStats() {
+        const records = loadStreakRecords();
+
+        if (!records.migrated) {
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const key = localStorage.key(index);
+            const slotNumber = getSlotNumberFromStorageKey(key);
+            if (slotNumber === null || records.outcomes[slotNumber]) {
+              continue;
+            }
+
+            try {
+              const saved = JSON.parse(localStorage.getItem(key));
+              if (saved && saved.done) {
+                records.outcomes[slotNumber] = { won: Boolean(saved.won) };
+              }
+            } catch (error) {
+              // 손상된 과거 기록은 건너뜁니다.
+            }
+          }
+          records.migrated = true;
+        }
+
+        if (state.done) {
+          records.outcomes[today.slotNumber] = { won: state.won };
+        }
+
+        saveStreakRecords(records);
+        return calculateStreakStats(records);
+      }
+
+      function loadStreakRecords() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STREAK_STORAGE_KEY));
+          if (saved && saved.outcomes && typeof saved.outcomes === "object") {
+            return saved;
+          }
+        } catch (error) {
+          // 새 기록으로 복구합니다.
+        }
+        return { outcomes: {}, migrated: false };
+      }
+
+      function saveStreakRecords(records) {
+        localStorage.setItem(STREAK_STORAGE_KEY, JSON.stringify(records));
+      }
+
+      function getSlotNumberFromStorageKey(key) {
+        const match = /^word5:(\d{4})-(\d{2})-(\d{2})-(AM|PM)$/.exec(key || "");
+        if (!match) {
+          return null;
+        }
+
+        const hour = match[4] === "AM" ? 0 : 12;
+        return Math.floor(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]), hour) / HALF_DAY_MS);
+      }
+
+      function recordOutcome(won) {
+        const records = loadStreakRecords();
+        records.outcomes[today.slotNumber] = { won: Boolean(won) };
+        records.migrated = true;
+        saveStreakRecords(records);
+        return calculateStreakStats(records);
+      }
+
+      function calculateStreakStats(records) {
+        const outcomes = Object.entries(records.outcomes)
+          .map(([slotNumber, result]) => ({
+            slotNumber: Number(slotNumber),
+            won: Boolean(result && result.won)
+          }))
+          .filter((result) => Number.isFinite(result.slotNumber))
+          .sort((a, b) => a.slotNumber - b.slotNumber);
+
+        let best = 0;
+        let run = 0;
+        let previousSlot = null;
+
+        for (const outcome of outcomes) {
+          if (!outcome.won) {
+            run = 0;
+          } else {
+            run = previousSlot !== null && outcome.slotNumber === previousSlot + 1 ? run + 1 : 1;
+            best = Math.max(best, run);
+          }
+          previousSlot = outcome.slotNumber;
+        }
+
+        let current = 0;
+        const latest = outcomes[outcomes.length - 1];
+        if (latest && latest.won && latest.slotNumber >= today.slotNumber - 1) {
+          current = 1;
+          for (let index = outcomes.length - 2; index >= 0; index -= 1) {
+            const newer = outcomes[index + 1];
+            const older = outcomes[index];
+            if (!older.won || newer.slotNumber !== older.slotNumber + 1) {
+              break;
+            }
+            current += 1;
+          }
+        }
+
+        return { current, best };
+      }
+
+      function getStreakTitle(streak) {
+        if (streak >= 50) return "원어민 ㅇㅈ";
+        if (streak >= 30) return "영주권 발급";
+        if (streak >= 10) return "토익 900 동급";
+        if (streak >= 5) return "영단어 고수";
+        return "";
+      }
+
       function buildKeyboard() {
         keyboard.innerHTML = "";
         for (const row of KEY_ROWS) {
@@ -2010,11 +2172,13 @@
         if (grades.every((grade) => grade === "correct")) {
           state.done = true;
           state.won = true;
+          streakStats = recordOutcome(true);
           showStatus("정답입니다.");
         } else if (state.guesses.length >= MAX_ATTEMPTS) {
           state.done = true;
           state.won = false;
-          showStatus("다음 문제는 내일 열립니다.");
+          streakStats = recordOutcome(false);
+          showStatus("다음 문제는 자정 또는 정오에 열립니다.");
         } else {
           showStatus(`${MAX_ATTEMPTS - state.guesses.length}번 남았습니다.`);
         }
@@ -2127,6 +2291,11 @@
           ? `${state.guesses.length}번 만에 맞췄습니다.`
           : "오늘은 여기까지입니다.";
         answerLine.innerHTML = `정답 <strong>${solution.word}</strong>`;
+        currentStreak.textContent = `${streakStats.current}회`;
+        bestStreak.textContent = `${streakStats.best}회`;
+        const title = getStreakTitle(streakStats.current);
+        streakTitle.textContent = title ? `칭호 · ${title}` : "";
+        streakTitle.hidden = !title;
         renderWordNote(solution.word);
       }
 
@@ -2193,13 +2362,21 @@
 
       function buildShareData() {
         const score = state.won ? `${state.guesses.length}/${MAX_ATTEMPTS}` : `X/${MAX_ATTEMPTS}`;
+        const title = getStreakTitle(streakStats.current);
         const rows = state.guesses.map((guess) => gradeGuess(guess, solution.word)
           .map((grade) => ({ correct: "🟩", present: "🟨", absent: "⬛" })[grade])
           .join(""));
         const url = window.location.href.split("#")[0];
+        const streakLines = [
+          `🔥 현재 연승 ${streakStats.current}회`,
+          `🏆 최고 연승 ${streakStats.best}회`
+        ];
+        if (title) {
+          streakLines.push(`🎖️ 칭호: ${title}`);
+        }
         return {
           title: "영단어 5",
-          text: [`영단어 5 ${today.label} ${score}`, ...rows].join("\n"),
+          text: [`영단어 5 ${today.label} ${score}`, ...rows, "", ...streakLines].join("\n"),
           url
         };
       }
