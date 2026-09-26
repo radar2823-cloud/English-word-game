@@ -1810,9 +1810,10 @@
       const closeHelpButton = document.querySelector("#closeHelpButton");
 
       const solutions = buildSolutions();
+      const solutionDeck = buildSolutionDeck();
       const validGuesses = buildValidGuesses();
       const today = getToday();
-      const solution = pickSolution(today.dateKey);
+      const solution = pickSolution(today.slotNumber);
       const storageKey = `word5:${today.dateKey}`;
       let state = loadState();
       let streakStats = initializeStreakStats();
@@ -1862,6 +1863,14 @@
         return new Set(words);
       }
 
+      function buildSolutionDeck() {
+        return [...solutions].sort((a, b) => {
+          const aScore = hashString(`${DAILY_RANDOM_SEED}:${a.word}`);
+          const bScore = hashString(`${DAILY_RANDOM_SEED}:${b.word}`);
+          return bScore - aScore || a.word.localeCompare(b.word);
+        });
+      }
+
       function normalizeWord(word) {
         return String(word).trim().toUpperCase();
       }
@@ -1884,19 +1893,13 @@
         };
       }
 
-      function pickSolution(dateKey) {
-        let bestSolution = solutions[0];
-        let bestScore = -1;
+      function pickSolution(slotNumber) {
+        const offset = slotNumber - BASE_SLOT;
+        return solutionDeck[positiveModulo(offset, solutionDeck.length)];
+      }
 
-        for (const candidate of solutions) {
-          const score = hashString(`${DAILY_RANDOM_SEED}:${dateKey}:${candidate.word}`);
-          if (score > bestScore) {
-            bestScore = score;
-            bestSolution = candidate;
-          }
-        }
-
-        return bestSolution;
+      function positiveModulo(value, length) {
+        return ((value % length) + length) % length;
       }
 
       function hashString(input) {
