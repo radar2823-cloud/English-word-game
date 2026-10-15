@@ -2065,6 +2065,8 @@
       }
 
       function getStreakTitle(streak) {
+        if (streak >= 100) return "일론머스크";
+        if (streak >= 70) return "미국박사";
         if (streak >= 50) return "원어민 ㅇㅈ";
         if (streak >= 30) return "영주권 발급";
         if (streak >= 10) return "토익 900 동급";
